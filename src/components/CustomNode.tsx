@@ -1,8 +1,15 @@
-import React from 'react';
-import { Handle, Position } from 'reactflow';
+import { Handle, Position, NodeProps } from 'reactflow';
 import { motion } from 'framer-motion';
 
-const themeMap = {
+export type CustomNodeData = {
+  title: string;
+  content: string[];
+  theme: 'root' | 'security' | 'availability' | 'continuity' | 'risk' | 'sla';
+  hasChildren: boolean;
+  type?: string;
+};
+
+const themeMap: Record<CustomNodeData['theme'], { bg: string; border: string; shadow: string; text: string; gradient: string }> = {
   root: {
     bg: 'bg-node-root',
     border: 'border-node-root',
@@ -47,7 +54,7 @@ const themeMap = {
   }
 };
 
-export default function CustomNode({ data, isConnectable }) {
+export default function CustomNode({ data, isConnectable }: NodeProps<CustomNodeData>) {
   const theme = themeMap[data.theme] || themeMap.root;
 
   return (
@@ -81,7 +88,7 @@ export default function CustomNode({ data, isConnectable }) {
         
         {data.content && data.content.length > 0 && (
           <div className="text-xs text-slate-300 leading-relaxed flex flex-col gap-2 font-medium">
-            {data.content.map((p, i) => (
+            {data.content.map((p: string, i: number) => (
               <p key={i} className="bg-black/20 p-2 rounded-lg border border-white/5">{p}</p>
             ))}
           </div>

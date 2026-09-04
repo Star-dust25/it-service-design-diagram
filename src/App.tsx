@@ -1,4 +1,3 @@
-import React, { useCallback } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -6,15 +5,17 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   MarkerType,
+  Node,
+  Edge
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import CustomNode from './components/CustomNode';
+import CustomNode, { CustomNodeData } from './components/CustomNode';
 
 const nodeTypes = {
   custom: CustomNode,
 };
 
-const initialNodes = [
+const initialNodes: Node<CustomNodeData>[] = [
   {
     id: 'root',
     type: 'custom',
@@ -108,7 +109,7 @@ const initialNodes = [
   }
 ];
 
-const initialEdges = [
+const initialEdges: Edge[] = [
   { id: 'e-root-sec', source: 'root', target: 'sec', type: 'smoothstep', animated: true, style: { stroke: '#fff', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#fff' } },
   { id: 'e-root-disp', source: 'root', target: 'disp', type: 'smoothstep', animated: true, style: { stroke: '#fff', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#fff' } },
   { id: 'e-root-cont', source: 'root', target: 'cont', type: 'smoothstep', animated: true, style: { stroke: '#fff', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#fff' } },
@@ -117,8 +118,8 @@ const initialEdges = [
 ];
 
 export default function App() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
   return (
     <div className="w-screen h-screen bg-[#0f172a]">
@@ -135,8 +136,9 @@ export default function App() {
         <Background color="#334155" gap={24} size={2} />
         <Controls />
         <MiniMap 
-          nodeColor={(node) => {
-            switch (node.data.theme) {
+          nodeColor={(node: Node) => {
+            const data = node.data as CustomNodeData;
+            switch (data.theme) {
               case 'root': return '#F59E0B';
               case 'security': return '#3B82F6';
               case 'availability': return '#EC4899';
