@@ -1,5 +1,6 @@
+import { useContext } from 'react';
 import { Handle, Position, type NodeProps } from 'reactflow';
-import { motion } from 'framer-motion';
+import { ThemeContext } from '../ThemeContext';
 
 export type CustomNodeData = {
   title: string;
@@ -9,101 +10,96 @@ export type CustomNodeData = {
   type?: string;
 };
 
-const themeMap: Record<CustomNodeData['theme'], { bg: string; border: string; shadow: string; text: string; gradient: string }> = {
-  root: {
-    bg: 'bg-node-root',
-    border: 'border-node-root',
-    shadow: 'shadow-node-root',
-    text: 'text-node-root',
-    gradient: 'from-node-root/20 to-transparent'
-  },
-  security: {
-    bg: 'bg-node-security',
-    border: 'border-node-security',
-    shadow: 'shadow-node-security',
-    text: 'text-node-security',
-    gradient: 'from-node-security/20 to-transparent'
-  },
-  availability: {
-    bg: 'bg-node-availability',
-    border: 'border-node-availability',
-    shadow: 'shadow-node-availability',
-    text: 'text-node-availability',
-    gradient: 'from-node-availability/20 to-transparent'
-  },
-  continuity: {
-    bg: 'bg-node-continuity',
-    border: 'border-node-continuity',
-    shadow: 'shadow-node-continuity',
-    text: 'text-node-continuity',
-    gradient: 'from-node-continuity/20 to-transparent'
-  },
-  risk: {
-    bg: 'bg-node-risk',
-    border: 'border-node-risk',
-    shadow: 'shadow-node-risk',
-    text: 'text-node-risk',
-    gradient: 'from-node-risk/20 to-transparent'
-  },
-  sla: {
-    bg: 'bg-node-sla',
-    border: 'border-node-sla',
-    shadow: 'shadow-node-sla',
-    text: 'text-node-sla',
-    gradient: 'from-node-sla/20 to-transparent'
-  }
+const themeMap: Record<CustomNodeData['theme'], { text: string; hex: string }> = {
+  root: { text: 'text-brand-yellow', hex: 'rgba(233,215,88,1)' },
+  security: { text: 'text-brand-teal', hex: 'rgba(41,115,115,1)' },
+  availability: { text: 'text-brand-orange', hex: 'rgba(255,133,82,1)' },
+  continuity: { text: 'text-brand-teal', hex: 'rgba(41,115,115,1)' },
+  risk: { text: 'text-brand-yellow', hex: 'rgba(233,215,88,1)' },
+  sla: { text: 'text-brand-orange', hex: 'rgba(255,133,82,1)' }
 };
 
 export default function CustomNode({ data, isConnectable }: NodeProps<CustomNodeData>) {
+  const isDark = useContext(ThemeContext);
   const theme = themeMap[data.theme] || themeMap.root;
 
+  // Dark Mode Styles
+  const darkBg = `bg-[${theme.hex}]/10`;
+  const darkBorder = `border-[${theme.hex}]/50`;
+  const darkGlow = `shadow-[0_0_25px_${theme.hex.replace(',1)', ',0.3)')}]`;
+  const darkGradient = `from-[${theme.hex}]/30 to-transparent`;
+  const darkContentBg = 'bg-black/40';
+  const darkContentText = 'text-white';
+
+  // Light Mode Styles
+  const lightBg = 'bg-white';
+  const lightBorder = `border-[${theme.hex}]`;
+  const lightGlow = 'shadow-lg';
+  const lightGradient = `from-[${theme.hex}]/10 to-transparent`;
+  const lightContentBg = 'bg-brand-light/40';
+  const lightContentText = 'text-brand-dark';
+
+  const currentBg = isDark ? darkBg : lightBg;
+  const currentBorder = isDark ? darkBorder : lightBorder;
+  const currentGlow = isDark ? darkGlow : lightGlow;
+  const currentGradient = isDark ? darkGradient : lightGradient;
+  const currentContentBg = isDark ? darkContentBg : lightContentBg;
+  const currentContentText = isDark ? darkContentText : lightContentText;
+
+  // En Light Mode, el texto principal oscuro puede verse mejor para temas claros como el amarillo.
+  // Pero como definiste text-brand-yellow, en fondo blanco no se leerá bien. 
+  // Usaremos un color de texto más legible en modo claro si es amarillo, o simplemente el brand-dark.
+  const isYellow = data.theme === 'root' || data.theme === 'risk';
+  const titleTextClass = isDark ? theme.text : (isYellow ? 'text-[#a18f27]' : theme.text);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.5, type: 'spring', bounce: 0.4 }}
-      whileHover={{ scale: 1.02, y: -5 }}
-      className={`relative w-[320px] rounded-2xl border border-white/10 bg-[#1e293b]/80 backdrop-blur-xl shadow-2xl overflow-hidden`}
+    <div
+      className={`relative w-[700px] rounded-3xl border-2 ${currentBorder} ${currentBg} ${isDark ? 'backdrop-blur-2xl' : ''} ${currentGlow} overflow-hidden transition-colors duration-500`}
     >
-      {/* Top Handles for incoming connections (except root) */}
       {data.type !== 'root' && (
         <Handle
           type="target"
           position={Position.Top}
           isConnectable={isConnectable}
-          className="w-3 h-3 border-2 border-[#0f172a] bg-slate-400"
+          className={`w-4 h-4 border-2 ${isDark ? 'border-brand-dark bg-brand-light' : 'border-brand-light bg-brand-dark'} shadow-sm`}
         />
       )}
 
       {/* Decorative Top Gradient Line */}
-      <div className={`h-1 w-full ${theme.bg}`}></div>
+      <div className={`h-2 w-full bg-gradient-to-r ${currentGradient} to-transparent`}></div>
       
       {/* Background ambient glow */}
-      <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-b ${theme.gradient} opacity-50 pointer-events-none`}></div>
+      <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-b ${currentGradient} opacity-20 pointer-events-none`}></div>
 
-      <div className="p-5 flex flex-col gap-3 relative z-10">
-        <h3 className={`text-base font-bold text-center tracking-wide uppercase ${theme.text}`}>
-          {data.title}
-        </h3>
+      <div className="p-10 flex flex-col gap-6 relative z-10">
+        <div className={`flex items-center gap-6 border-b ${isDark ? 'border-brand-light/10' : 'border-brand-dark/10'} pb-6`}>
+          <h3 className={`text-3xl font-black tracking-wider uppercase leading-tight ${titleTextClass}`}>
+            {data.title}
+          </h3>
+        </div>
         
         {data.content && data.content.length > 0 && (
-          <div className="text-xs text-slate-300 leading-relaxed flex flex-col gap-2 font-medium">
+          <div className={`text-2xl ${currentContentText} leading-relaxed flex flex-col gap-5 font-medium`}>
             {data.content.map((p: string, i: number) => (
-              <p key={i} className="bg-black/20 p-2 rounded-lg border border-white/5">{p}</p>
+              <p 
+                key={i} 
+                className={`${currentContentBg} p-5 rounded-xl border-2 ${isDark ? 'border-brand-light/5 shadow-inner' : 'border-brand-dark/5'}`}
+              >
+                {p}
+              </p>
             ))}
           </div>
         )}
       </div>
 
-      {/* Bottom Handle for outgoing connections */}
       {data.hasChildren && (
         <Handle
           type="source"
           position={Position.Bottom}
           isConnectable={isConnectable}
-          className="w-3 h-3 border-2 border-[#0f172a] bg-slate-400"
+          className={`w-4 h-4 border-2 ${isDark ? 'border-brand-dark bg-brand-light' : 'border-brand-light bg-brand-dark'} shadow-sm`}
         />
       )}
-    </motion.div>
+    </div>
   );
 }

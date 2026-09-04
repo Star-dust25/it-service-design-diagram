@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -10,6 +11,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import CustomNode, { type CustomNodeData } from './components/CustomNode';
+import { ThemeContext } from './ThemeContext';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -19,19 +21,19 @@ const initialNodes: Node<CustomNodeData>[] = [
   {
     id: 'root',
     type: 'custom',
-    position: { x: 500, y: 50 },
+    position: { x: 900, y: 0 },
     data: {
       title: 'Gestión del Diseño de Servicios de TI',
       content: [],
       theme: 'root',
       type: 'root',
-      hasChildren: true
+      hasChildren: true,
     },
   },
   {
     id: 'sec',
     type: 'custom',
-    position: { x: 150, y: 250 },
+    position: { x: 0, y: 400 },
     data: {
       title: 'Seguridad de la Información',
       content: [
@@ -41,13 +43,13 @@ const initialNodes: Node<CustomNodeData>[] = [
         'Se alinea con marcos internacionales como ISO 27001.'
       ],
       theme: 'security',
-      hasChildren: false
+      hasChildren: false,
     },
   },
   {
     id: 'disp',
     type: 'custom',
-    position: { x: 850, y: 250 },
+    position: { x: 1800, y: 400 },
     data: {
       title: 'Disponibilidad de TI',
       content: [
@@ -58,13 +60,13 @@ const initialNodes: Node<CustomNodeData>[] = [
         'Fórmula de disponibilidad %: (Tiempo acordado - Downtime) / Tiempo acordado x 100%.'
       ],
       theme: 'availability',
-      hasChildren: false
+      hasChildren: false,
     },
   },
   {
     id: 'cont',
     type: 'custom',
-    position: { x: 150, y: 700 },
+    position: { x: 0, y: 1400 },
     data: {
       title: 'Continuidad del Servicio',
       content: [
@@ -73,13 +75,13 @@ const initialNodes: Node<CustomNodeData>[] = [
         'Utiliza pruebas de contingencia y sitios alternos para la recuperación.'
       ],
       theme: 'continuity',
-      hasChildren: false
+      hasChildren: false,
     },
   },
   {
     id: 'risk',
     type: 'custom',
-    position: { x: 500, y: 700 },
+    position: { x: 900, y: 1400 },
     data: {
       title: 'Gestión de Riesgos',
       content: [
@@ -89,13 +91,13 @@ const initialNodes: Node<CustomNodeData>[] = [
         'Emplea una Matriz de Riesgos para clasificar la severidad (de Bajo a Extremo) y monitorear métricas clave.'
       ],
       theme: 'risk',
-      hasChildren: false
+      hasChildren: false,
     },
   },
   {
     id: 'sla',
     type: 'custom',
-    position: { x: 850, y: 700 },
+    position: { x: 1800, y: 1400 },
     data: {
       title: 'SLA y Tolerancia a Fallos',
       content: [
@@ -104,54 +106,75 @@ const initialNodes: Node<CustomNodeData>[] = [
         'Implementa soluciones de hardware y red, como balanceadores de carga y redundancia para prevenir interrupciones graves.'
       ],
       theme: 'sla',
-      hasChildren: false
+      hasChildren: false,
     },
   }
 ];
 
-const initialEdges: Edge[] = [
-  { id: 'e-root-sec', source: 'root', target: 'sec', type: 'smoothstep', animated: true, style: { stroke: '#fff', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#fff' } },
-  { id: 'e-root-disp', source: 'root', target: 'disp', type: 'smoothstep', animated: true, style: { stroke: '#fff', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#fff' } },
-  { id: 'e-root-cont', source: 'root', target: 'cont', type: 'smoothstep', animated: true, style: { stroke: '#fff', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#fff' } },
-  { id: 'e-root-risk', source: 'root', target: 'risk', type: 'smoothstep', animated: true, style: { stroke: '#fff', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#fff' } },
-  { id: 'e-root-sla', source: 'root', target: 'sla', type: 'smoothstep', animated: true, style: { stroke: '#fff', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#fff' } },
-];
-
 export default function App() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // Generamos los edges dinámicamente para cambiar su color según el tema
+  const edges: Edge[] = [
+    { id: 'e-root-sec', source: 'root', target: 'sec', type: 'smoothstep', style: { stroke: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)', strokeWidth: 4 }, markerEnd: { type: MarkerType.ArrowClosed, color: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)' } },
+    { id: 'e-root-disp', source: 'root', target: 'disp', type: 'smoothstep', style: { stroke: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)', strokeWidth: 4 }, markerEnd: { type: MarkerType.ArrowClosed, color: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)' } },
+    { id: 'e-root-cont', source: 'root', target: 'cont', type: 'smoothstep', style: { stroke: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)', strokeWidth: 4 }, markerEnd: { type: MarkerType.ArrowClosed, color: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)' } },
+    { id: 'e-root-risk', source: 'root', target: 'risk', type: 'smoothstep', style: { stroke: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)', strokeWidth: 4 }, markerEnd: { type: MarkerType.ArrowClosed, color: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)' } },
+    { id: 'e-root-sla', source: 'root', target: 'sla', type: 'smoothstep', style: { stroke: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)', strokeWidth: 4 }, markerEnd: { type: MarkerType.ArrowClosed, color: isDarkMode ? 'rgba(230,230,230,0.4)' : 'rgba(57,57,58,0.4)' } },
+  ];
+  const [, , onEdgesChange] = useEdgesState(edges);
 
   return (
-    <div className="w-screen h-screen bg-[#0f172a]">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.2}
+    <ThemeContext.Provider value={isDarkMode}>
+      <div 
+        className={`w-screen h-screen transition-colors duration-500 ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
+        style={{ 
+          backgroundColor: isDarkMode ? '#39393A' : '#E6E6E6',
+          backgroundImage: isDarkMode ? 'radial-gradient(circle at 50% 0%, #4a4a4b 0%, #39393A 70%)' : 'none'
+        }}
       >
-        <Background color="#334155" gap={24} size={2} />
-        <Controls />
-        <MiniMap 
-          nodeColor={(node: Node) => {
-            const data = node.data as CustomNodeData;
-            switch (data.theme) {
-              case 'root': return '#F59E0B';
-              case 'security': return '#3B82F6';
-              case 'availability': return '#EC4899';
-              case 'continuity': return '#10B981';
-              case 'risk': return '#F97316';
-              case 'sla': return '#8B5CF6';
-              default: return '#eee';
-            }
-          }}
-          maskColor="rgba(15, 23, 42, 0.7)"
-          style={{ backgroundColor: '#1e293b' }}
-        />
-      </ReactFlow>
-    </div>
+        
+        {/* Toggle Theme Button */}
+        <div className="absolute top-4 right-4 z-50">
+          <button 
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className={`px-4 py-2 rounded-full font-bold shadow-md transition-colors ${isDarkMode ? 'bg-brand-light text-brand-dark hover:bg-white' : 'bg-brand-dark text-brand-light hover:bg-black'}`}
+          >
+            {isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
+          </button>
+        </div>
+
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          fitView
+          fitViewOptions={{ padding: 0.2 }}
+          minZoom={0.2}
+        >
+          <Background color={isDarkMode ? "#334155" : "#cbd5e1"} gap={24} size={2} />
+          <Controls />
+          <MiniMap 
+            nodeColor={(node: Node) => {
+              const data = node.data as CustomNodeData;
+              switch (data.theme) {
+                case 'root': return '#E9D758';
+                case 'security': return '#297373';
+                case 'availability': return '#FF8552';
+                case 'continuity': return '#297373';
+                case 'risk': return '#E9D758';
+                case 'sla': return '#FF8552';
+                default: return '#E6E6E6';
+              }
+            }}
+            maskColor={isDarkMode ? "rgba(15, 23, 42, 0.7)" : "rgba(230, 230, 230, 0.7)"}
+            style={{ backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc' }}
+          />
+        </ReactFlow>
+      </div>
+    </ThemeContext.Provider>
   );
 }
