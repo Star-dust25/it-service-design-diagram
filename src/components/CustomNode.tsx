@@ -1,4 +1,4 @@
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, type NodeProps } from 'reactflow';
 import { motion } from 'framer-motion';
 
 export type CustomNodeData = {

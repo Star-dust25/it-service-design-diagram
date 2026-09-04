@@ -5,11 +5,11 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   MarkerType,
-  Node,
-  Edge
+  type Node,
+  type Edge
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import CustomNode, { CustomNodeData } from './components/CustomNode';
+import CustomNode, { type CustomNodeData } from './components/CustomNode';
 
 const nodeTypes = {
   custom: CustomNode,
